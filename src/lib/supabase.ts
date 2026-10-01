@@ -4,9 +4,10 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const REQUEST_TIMEOUT_MS = 20000;
 
-export function fetchWithTimeout(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+export function fetchWithTimeout(input: RequestInfo | URL, init?: RequestInit, timeoutMs = REQUEST_TIMEOUT_MS): Promise<Response> {
+  if (timeoutMs <= 0) return fetch(input, init);
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
   return fetch(input, { ...init, signal: controller.signal }).finally(() => clearTimeout(timeoutId));
 }
 
@@ -14,14 +15,14 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   global: { fetch: fetchWithTimeout as typeof fetch },
 });
 
-export async function fetchRestJson<T>(table: string, query: Record<string, string>): Promise<T> {
+export async function fetchRestJson<T>(table: string, query: Record<string, string>, timeoutMs = REQUEST_TIMEOUT_MS): Promise<T> {
   const url = new URL(`${supabaseUrl}/rest/v1/${table}`);
   Object.entries(query).forEach(([key, value]) => url.searchParams.set(key, value));
   const response = await fetchWithTimeout(url, {
     headers: {
       apikey: supabaseAnonKey,
     },
-  });
+  }, timeoutMs);
   if (!response.ok) throw new Error(`Request failed (${response.status})`);
   return response.json() as Promise<T>;
 }
