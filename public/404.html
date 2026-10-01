@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="dv" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ޔައުމިއްޔާ ސިސްޓަމް</title>
+    <script>
+      // SPA redirect: GitHub Pages serves 404.html for unknown paths
+      // Redirect to index.html with the original path preserved
+      var pathSegmentsToKeep = 1; // matches base path /yaumiyya-meeting-system/
+      var l = window.location;
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?' +
+        'p=' + l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1) : '') +
+        (l.hash ? l.hash.slice(1) : '')
+      );
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
